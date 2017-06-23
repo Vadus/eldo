@@ -50,9 +50,11 @@ def getTickerData():
             value = chart_data[0][field]
             if field == 'date':
                 value = to_dateString(value)
+                logItem[field.encode('ascii', 'ignore')] = value
             else:
                 value = to_decimal(value)
-            logItem[field.encode('ascii', 'ignore')] = value
+                if value > 0:
+                    logItem[field.encode('ascii', 'ignore')] = value
         
         print logItem
         logging.info(logItem, extra=logItem)
