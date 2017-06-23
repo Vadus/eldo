@@ -46,15 +46,25 @@ def getTickerData():
             logItem[field.encode('ascii', 'ignore')] = value
         
         chart_data = p.returnChartData(currencyPair)
+        openValue = Decimal('0')
+        closeValue = Decimal('0')
         for field in chart_data[0]:
             value = chart_data[0][field]
             if field == 'date':
                 value = to_dateString(value)
-                logItem[field.encode('ascii', 'ignore')] = value
             else:
                 value = to_decimal(value)
-                if value > 0:
-                    logItem[field.encode('ascii', 'ignore')] = value
+                if field == 'open':
+                    openValue = value
+                elif field == 'close':
+                    closeValue = value
+            
+            logItem[field.encode('ascii', 'ignore')] = value
+        
+        if openValue > 0:
+            logItem['change'] = ((closeValue - openValue) / openValue) * 100
+        else:
+            logItem['change'] = Decimal('0');
         
         print logItem
         logging.info(logItem, extra=logItem)
