@@ -85,7 +85,3 @@ def startPeriodicalRuntime():
 def start():
     startPeriodicalRuntime()
     
-def importData(chartDataAge):
-    getTickerData(chartDataAge)
-    
-    
