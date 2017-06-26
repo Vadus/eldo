@@ -31,7 +31,7 @@ class poloniex:
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command))
             return json.loads(ret.read())
         elif(command == "returnChartData"):
-            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'] + '&start=' + str((int(time.time()) - 300)) + '&period=' + str(300))))
+            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'] + '&start=' + str((int(time.time()) - req['chartDataAge'])) + '&period=' + str(300))))
             return json.loads(ret.read())
         elif(command == "returnOrderBook"):
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'])))
@@ -58,8 +58,8 @@ class poloniex:
     def returnTicker(self):
         return self.api_query("returnTicker")
     
-    def returnChartData(self, currencyPair):
-        return self.api_query("returnChartData", {'currencyPair': currencyPair})
+    def returnChartData(self, currencyPair, chartDataAge = 300):
+        return self.api_query("returnChartData", {'currencyPair': currencyPair, 'chartDataAge' : chartDataAge})
 
     def return24Volume(self):
         return self.api_query("return24Volume")
