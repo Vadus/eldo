@@ -53,6 +53,7 @@ def getTickerData(chartDataAge = 300):
             for field in chart_data_line:
                 value = chart_data_line[field]
                 if field == 'date':
+                    chartItem['chartItemId'] = chartItem['item'] + '_' + str(value)
                     value = to_dateString(value)
                 else:
                     value = to_decimal(value)
