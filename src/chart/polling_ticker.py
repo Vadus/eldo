@@ -1,4 +1,4 @@
-import os, time, logging, threading
+import os, time, logging, requests, json
 
 from poloniex import poloniex
 from cmreslogging.handlers import CMRESHandler
@@ -29,6 +29,23 @@ def to_dateString(value):
     if value == 0:
         value = int(time.time())
     return time.strftime('%Y-%m-%dT%H:%M:%S', (time.gmtime(value)))
+
+
+def alreadyExists(chartItemId):
+    query = json.dumps({
+          "query": {
+              "match" : { "message" : "%s"%chartItemId }
+          }
+    })
+    
+    response = requests.post('http://' + elastic_host + ':9200/_search', data=query)
+    result = json.loads(response.text)
+    
+    amount = result["hits"]["total"]
+    if amount == 0:
+        return True
+    
+    return False
 
 def getTickerData(chartDataAge = 300):
     p = poloniex.poloniex("dunno", "what")
@@ -63,6 +80,11 @@ def getTickerData(chartDataAge = 300):
                         closeValue = value
                 
                 chartItem[field.encode('ascii', 'ignore')] = value
+            try:    
+                if not alreadyExists(chartItem['chartItemId']):
+                    continue
+            except KeyError, e:
+                continue
         
             if openValue > 0:
                 chartItem['change'] = ((closeValue - openValue) / openValue) * 100
@@ -72,17 +94,3 @@ def getTickerData(chartDataAge = 300):
             print chartItem
             logging.info(chartItem, extra=chartItem)
         time.sleep(0.2)
-
-             
-
-# entrypoint of script calls itself periodically via Timer call
-# may drift a little bit in time see http://stackoverflow.com/a/18180189
-def startPeriodicalRuntime():
-    print("Calling Elastic. Next Call will be in %d seconds" %WAIT_PERIOD)
-    threading.Timer( WAIT_PERIOD, startPeriodicalRuntime ).start()
-    getTickerData()
-    return
-
-def start():
-    startPeriodicalRuntime()
-    
