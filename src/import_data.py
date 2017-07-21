@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 from chart import polling_ticker
 
