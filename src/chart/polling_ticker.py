@@ -14,7 +14,7 @@ handler = CMRESHandler(hosts=[{'host': elastic_host, 'port': 9200}],
                            es_index_name="poloniex")
 log = logging.getLogger()
 log.setLevel(logging.INFO)
-log.addHandler(handler)
+
 
 
 def to_decimal(value):
@@ -38,11 +38,12 @@ def alreadyExists(chartItemId):
           }
     })
     
-    response = requests.post('http://' + elastic_host + ':9200/_search', data=query)
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    response = requests.post('http://' + elastic_host + ':9200/_search', data=query, headers=headers)
     result = json.loads(response.text)
     
     amount = result["hits"]["total"]
-    if amount == 0:
+    if amount > 0:
         return True
     
     return False
@@ -81,10 +82,10 @@ def getTickerData(chartDataAge = 300):
                 
                 chartItem[field.encode('ascii', 'ignore')] = value
             try:    
-                if not alreadyExists(chartItem['chartItemId']):
+                if alreadyExists(chartItem['chartItemId']):
                     print('Found data that already exists for chartItemId %s with open %d, close %d'%(chartItem['chartItemId'], openValue, closeValue))
                     continue
-            except KeyError, e:
+            except KeyError:
                 continue
         
             if openValue > 0:
@@ -93,5 +94,9 @@ def getTickerData(chartDataAge = 300):
                 chartItem['change'] = Decimal('0');
             
             print chartItem
+            
+            log.addHandler(handler)
             logging.info(chartItem, extra=chartItem)
+            log.removeHandler(handler)
+            
         time.sleep(0.2)
