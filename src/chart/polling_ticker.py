@@ -82,6 +82,7 @@ def getTickerData(chartDataAge = 300):
                 chartItem[field.encode('ascii', 'ignore')] = value
             try:    
                 if not alreadyExists(chartItem['chartItemId']):
+                    print('Found data that already exists for chartItemId %s with open %d, close %d'%(chartItem['chartItemId'], openValue, closeValue))
                     continue
             except KeyError, e:
                 continue
