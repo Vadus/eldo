@@ -34,7 +34,7 @@ def to_dateString(value):
 def alreadyExists(chartItemId):
     query = json.dumps({
           "query": {
-              "match" : { "message" : "%s"%chartItemId }
+              "match" : { "chartItemId" : "%s"%chartItemId }
           }
     })
     
