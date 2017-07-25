@@ -72,7 +72,7 @@ def getTickerData():
                 else:
                     logItem['change'] = Decimal('0');
         
-        #print logItem
+        print logItem
         log.addHandler(handler)
         logging.info(logItem, extra=logItem)
         log.removeHandler(handler)
