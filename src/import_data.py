@@ -1,10 +1,15 @@
 #!/usr/bin/python
 
-import sys
 from chart import polling_ticker
+import time
 
-if len(sys.argv) > 1:
-    polling_ticker.getTickerData(int(sys.argv[1]))
-else:
-    polling_ticker.getTickerData(300)
-    
+actualSecond = int(time.strftime('%S', (time.gmtime())))
+restSeconds = 60 - actualSecond;
+#print 'actual second: %d, rest seconds until next minute %d'%(actualSecond, restSeconds)
+if restSeconds >= 10:
+    times = int(restSeconds / 10.0 + 0.5)
+    #print 'polling %d times'%times
+    for i in range(times):
+        #print 'polling... at %s'%time.strftime('%Y-%m-%dT%H:%M:%S', (time.localtime()))
+        polling_ticker.getTickerData()
+        time.sleep(10)
